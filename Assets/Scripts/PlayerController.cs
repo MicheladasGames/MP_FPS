@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+[RequireComponent(typeof(ConfigurableJoint))]
 [RequireComponent(typeof(PlayerMotor))]
 public class PlayerController : MonoBehaviour {
 
@@ -7,12 +8,19 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     private float lookSensitivity = 1f;
 
+    [SerializeField]
+    private float thrusterForce = 1000f;
 
+    /*
+     * Esta parte está obsoleta, la he omitido
+    [SerializeField]
+    private ConfigurableJoint confJoint;
+    */
     private PlayerMotor motor;
 
     void Start()
     {
-        motor = GetComponent<PlayerMotor>();
+        motor = GetComponent<PlayerMotor>();        
     }
 
     void Update()
@@ -35,9 +43,21 @@ public class PlayerController : MonoBehaviour {
 
         //Calculate rotation - Vertical is only for camera (Model would rotate, that's weird)
         float _xRot = Input.GetAxisRaw("Mouse Y");
-        Vector3 _cameraRotation = new Vector3(_xRot, 0f, 0f) * lookSensitivity;
+        //Old Rotational calculation for camera
+        //Vector3 _cameraRotation = new Vector3(_xRot, 0f, 0f) * lookSensitivity;
+        float _cameraRotation = _xRot * lookSensitivity;
 
-        motor.RotateCamera(-_cameraRotation); 
+        motor.RotateCamera(-_cameraRotation);
+
+        //Setup Thruster
+        Vector3 _thrusterForce = Vector3.zero;
+        if (Input.GetButton("Jump"))
+        {
+            _thrusterForce = Vector3.up * thrusterForce;
+        }
+
+        //apply Thruster force
+        motor.ApplyThruster(_thrusterForce);
     }
 
 

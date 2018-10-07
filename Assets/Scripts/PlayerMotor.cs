@@ -5,10 +5,17 @@ public class PlayerMotor : MonoBehaviour {
     [SerializeField]
     private Camera cam;
 
+    [SerializeField]
+    private float cameraRotLim = 85f;
+
     private Vector3 velocity = Vector3.zero;
     private Vector3 rotation = Vector3.zero;
-    private Vector3 cameraRotation = Vector3.zero;
+    private float cameraRotationX = 0f;
+    private float currentCameraRotationX = 0f;
+    private Vector3 thrusterforce = Vector3.zero;
+
     private Rigidbody rb;
+
 
 	// Use this for initialization
 	void Start () {
@@ -32,9 +39,9 @@ public class PlayerMotor : MonoBehaviour {
         rotation = _rotation;
     }
 
-    public void RotateCamera(Vector3 _cameraRotation)
+    public void RotateCamera(float _cameraRotationX)
     {
-        cameraRotation = _cameraRotation;
+        cameraRotationX = _cameraRotationX;
     }
 
     void PerformRot()
@@ -44,7 +51,14 @@ public class PlayerMotor : MonoBehaviour {
             rb.MoveRotation(rb.rotation * Quaternion.Euler(rotation));
             if (cam != null)
             {
-                cam.transform.Rotate(cameraRotation);
+                /* Old Rotational Code
+                cam.transform.Rotate(cameraRotationX);
+                */
+                // Set rotation and clamp it
+                currentCameraRotationX -= cameraRotationX;
+                currentCameraRotationX = Mathf.Clamp(currentCameraRotationX, -cameraRotLim, cameraRotLim);
+                // Set rotation to the rotation of our camera
+                cam.transform.localEulerAngles = new Vector3(-currentCameraRotationX, 0, 0);
             }
         }
     }
@@ -55,5 +69,15 @@ public class PlayerMotor : MonoBehaviour {
         {
             rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
         }
+        if (thrusterforce != Vector3.zero)
+        {
+            rb.AddForce(thrusterforce * Time.deltaTime, ForceMode.Acceleration);
+        }
+    }
+
+    // Get force vector for Thruster
+    public void ApplyThruster (Vector3 _thusterForce)
+    {
+        thrusterforce = _thusterForce;
     }
 }
