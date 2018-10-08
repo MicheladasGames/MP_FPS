@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(Player))]
+
 public class PlayerSetup : NetworkBehaviour
 {
     [SerializeField]
@@ -26,14 +28,24 @@ public class PlayerSetup : NetworkBehaviour
         }
 
         
-        RegisterPlayer();
+        //RegisterPlayer();
     }
 
-    void RegisterPlayer()
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        string _netId = GetComponent<NetworkIdentity>().netId.ToString();
+        Player _player = GetComponent<Player>();
+        GameManager.RegisterPlayer(_netId, _player);
+    }
+
+    //Managed by GameManager.cs
+    /*void RegisterPlayer()
     {
         string _Id = "Player " + GetComponent<NetworkIdentity>().netId;
         transform.name = _Id;
     }
+    */
 
     private void AssignRemoteLayer ()
     {
@@ -53,5 +65,6 @@ public class PlayerSetup : NetworkBehaviour
         {
             sceneCamera.gameObject.SetActive(true);
         }
+        GameManager.UnregisterPlayer(transform.name);
     }
 }
