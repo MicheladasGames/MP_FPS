@@ -26,9 +26,9 @@ public class PlayerSetup : NetworkBehaviour
             }
             
         }
-
+        GetComponent<Player>().Setup();
         
-        //RegisterPlayer();
+        //RegisterPlayer(); 
     }
 
     public override void OnStartClient()

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
-
+    #region Player Registry
     private static Dictionary<string, Player> playerDict = new Dictionary<string, Player>();
     private const string PLAYER_ID_PREFIX = "Player ";
 
@@ -37,6 +37,22 @@ public class GameManager : MonoBehaviour
     //    GUILayout.EndVertical();
     //    GUILayout.EndArea();
     //}
+    #endregion
+
+    public static GameManager instance;
+    public MatchSettings matchSettings;
+
+    void Awake()
+    {
+        if (instance != null)
+        {
+            Debug.LogError("More than one GameManager in Scene");
+        }
+        else
+        {
+            instance = this;
+        }
+    }
 }
 
 
